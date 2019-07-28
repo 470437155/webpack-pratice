@@ -1,0 +1,16 @@
+{
+    "plugins":[
+    //   ["@babel/preset-env",{
+    //   targets:{
+    //     chrome:"67"
+    //   },
+    //   useBuiltIns:'usage'
+    // }]
+    ["module:@babel/plugin-transform-runtime",{
+      "corejs":2,
+      "helpers":true,
+      "regenerator":true,
+      "useESModules":false
+    }]
+  ]
+}
