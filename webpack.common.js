@@ -1,27 +1,17 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
-const webpack =require('webpack')
 
 module.exports = {
-  mode: "development",
-  devtool: "eval-cheap-module-source-map",
   entry: {
     main: "./src/index.js"
-  },
-  devServer: {
-    contentBase: "./dist",
-    open: true,
-    hot: true,
-    hotOnly:true,
-    port: 3000  
   },
   module: {
     rules: [
       {
-        test:/\.js$/,
-        exclude:/node_module/,
-        loader:"babel-loader"
+        test: /\.js$/,
+        exclude: /node_module/,
+        loader: "babel-loader"
       },
       {
         test: /\.(png|png|gif)$/,
@@ -73,12 +63,34 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: "src/index.html"
     }),
-    new CleanWebpackPlugin(),
-    new webpack.HotModuleReplacementPlugin()
+    new CleanWebpackPlugin()
   ],
-  // htmlWebpackPlugin会在打包结束后,自动生成一个html文件,并把打包生成的js自动引入到这个html文件中
+  optimization: {
+    splitChunks: {
+      chunks: "all", //async只对异步生效,all对所有生效
+      minSize: 30000, //大于这个字节数才做代码分割
+      maxSize:0,//对大文件进行拆分,一般不用
+      minChunks: 1,//当一个模块至少被引用n次的才分割
+      maxAsyncRequests: 5,//只对入口文件的前五个做分割
+      maxInitialRequests: 3,
+      automaticNameDelimiter: "~",//文件生成后名字的连接符
+      name: true,
+      cacheGroups: {
+        vendors: {
+          test: /[\\/]node_modules[\\/]/,
+          priority: -10,
+          // filename: "vendors.js"
+        },
+        default: {
+          priority: -20,
+          reuseExistingChunk: true,//如果一个模块已经被打包过了,那么就会被忽略
+          filename:'common.js'
+        }
+      }
+    }
+  },
   output: {
-    publicPath:"/",
+    // publicPath: "/",
     filename: "[name].js",
     path: path.resolve(__dirname, "dist")
   }
